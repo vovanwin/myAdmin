@@ -1,119 +1,90 @@
 package users
 
 import (
-	"log"
-	"myAdmin/resources/templates"
-	"myAdmin/router"
+	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+// Implementation содержит обработчики для работы с пользователями.
 type Implementation struct {
-	template templates.AdminTemplate
+	app *gin.Engine
 }
 
-func UserScreen(
-	r router.AdminRouter,
-	template templates.AdminTemplate,
-) {
+// UserScreen регистрирует маршруты и их обработчики.
+func UserScreen(app *gin.Engine) {
 	controller := &Implementation{
-		template,
+		app: app,
 	}
 
-	r.HandleFunc("", controller.UserScreen).Name("home")
+	// Регистрация маршрутов
+	app.GET("/", controller.HomePage)
+	app.GET("/users", controller.Users)
+	app.GET("/users/edit/:id", controller.UserEdit)
+	app.DELETE("/users/:id", controller.UserDelete)
 }
 
-func (i *Implementation) UserScreen(w http.ResponseWriter, r *http.Request) {
+// HomePage обрабатывает запрос на главную страницу.
+func (i *Implementation) HomePage(c *gin.Context) {
 
+	c.HTML(200, "page/users/userList", gin.H{
+		"title":   "Home Page",
+		"content": "Welcome to the Home Page!",
+	})
+}
+
+// UsersPage обрабатывает запрос на страницу пользователей.
+func (i *Implementation) Users(c *gin.Context) {
+	c.HTML(200, "userList.gohtml", gin.H{
+		"Title": "Список пользователей",
+		"Users": users,
+	})
+
+}
+
+func (i *Implementation) UserEdit(c *gin.Context) {
 	user := User{
-		ID:     1,
-		Name:   "Иван Иванов",
-		Role:   "Администратор",
-		Email:  "ivan@example.com",
-		Avatar: "/path/to/avatar.jpg",
+		ID:    1,
+		Name:  "Lol",
+		Email: "lo.email.ru",
 	}
 
-	dataUsers := struct {
-		Title string
-		Users []UserList
-		Year  int
-	}{
-		Title: "Управление пользователями",
-		Users: []UserList{
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-			{Name: "Админ m1", Email: "admin@m1.com", LastEdited: "24 ноя 2024"},
-		},
-		Year: 2024,
-	}
-
-	data := map[string]interface{}{
-		"Title":   "Панель управления",
-		"Users":   dataUsers,
-		"Sidebar": RenderSidebar(user),
-	}
-
-	err := i.template.ExecuteTemplate(w, "userList.gohtml", data)
-	if err != nil {
-		log.Fatal(err)
-	}
+	c.HTML(http.StatusOK, "update.gohtml", gin.H{
+		"Title": "Edit User",
+		"User":  user,
+	})
 }
 
-// Пример функции для генерации данных
-func RenderSidebar(user User) map[string]interface{} {
-	return map[string]interface{}{
-		"UserName":   user.Name,
-		"UserRole":   user.Role,
-		"UserAvatar": user.Avatar,
+func (i *Implementation) UserDelete(c *gin.Context) {
+	user := User{
+		ID:    1,
+		Name:  "Lol",
+		Email: "lo.email.ru",
 	}
+
+	c.HTML(http.StatusOK, "edit_user.html", gin.H{
+		"Title": "Edit User",
+		"User":  user,
+	})
 }
 
 type User struct {
-	ID         int
-	Name       string
-	Role       string
-	Email      string
-	Avatar     string
-	LastEdited string
+	ID    int
+	Name  string
+	Email string
 }
 
-type UserList struct {
-	Name       string
-	Email      string
-	LastEdited string
+type Device struct {
+	ID   int
+	Name string
+	Type string
+}
+
+var users = []User{
+	{ID: 1, Name: "John Doe1", Email: "john@example.com"},
+	{ID: 2, Name: "Jane Doe222", Email: "jane@example.com"},
+}
+
+var devices = []Device{
+	{ID: 1, Name: "Device 1", Type: "Type A"},
+	{ID: 2, Name: "Device 2", Type: "Type B"},
 }

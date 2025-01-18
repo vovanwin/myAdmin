@@ -1,21 +1,20 @@
 package cmd
 
 import (
+	"github.com/gin-gonic/gin"
 	"log"
-	"myAdmin/router"
-	"net/http"
-	"time"
+	"myAdmin/resources/templates"
 )
 
-func NewServerAdmin(r router.AdminRouter) {
-	// Создаём сервер с таймаутами
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         "127.0.0.1:8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
+func NewServerAdmin(temp *templates.TemplateHtml) (*gin.Engine, error) {
+	router := gin.Default()
 
-	log.Println("Server is running on http://127.0.0.1:8000/admin")
-	log.Fatal(srv.ListenAndServe())
+	router.HTMLRender = temp.Renderer
+	return router, nil
+}
+
+func ServerAdminRun(app *gin.Engine) {
+	if err := app.Run(":3001"); err != nil {
+		log.Fatal(err)
+	}
 }

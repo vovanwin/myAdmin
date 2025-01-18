@@ -1,103 +1,28 @@
 <!DOCTYPE html>
-<html lang="ru" data-controller="html-load" dir="ltr">
+<html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
-    <title>
-        {{template "title" .}}
-    </title>
-    <link rel="stylesheet" type="text/css" href="admin/static/css/orchid.css">
-
-    <meta name="robots" content="noindex"/>
-    <meta name="google" content="notranslate">
-    <link
-            href="http://localhost/vendor/orchid/favicon.svg"
-            sizes="any"
-            type="image/svg+xml"
-            id="favicon"
-            rel="icon"
-    >
-
-    <!-- For Safari on iOS -->
-    <meta name="theme-color" content="#21252a">
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-
-<body class="page-platform-systems-users" data-controller="pull-to-refresh">
-
-<div class="container-fluid" data-controller="base">
-
-    <div class="row justify-content-center d-md-flex h-100">
-        <div class="aside col-xs-12 col-xxl-2 bg-dark d-flex flex-column me-auto" data-controller="menu">
-            <header class="d-xl-block p-3 mt-xl-4 w-100 d-flex align-items-center">
-                <a class="header-brand order-last" href="/admin">
-                    <div class="h2 d-flex align-items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                             class="d-inline d-xl-none" viewBox="0 0 16 16" role="img" path="bs.house"
-                             componentName="orchid-icon">
-                            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"></path>
-                        </svg>
-
-                        <p class="my-0 d-none d-xl-block">
-                            Мегафон
-                        </p>
-                    </div>
-                </a>
-            </header>
-
-            {{template "navbar" .}}
-
-        </div>
-
-        <div class="col-xxl col-xl-9 col-12">
-
-            <div class="p-0 h-100">
-                <div class="workspace pt-3 pt-md-4 mb-4 mb-md-0 d-flex flex-column h-100">
-
-                    {{template "breadcrumb" .}}
-                    {{template "header" .}}
-                    {{template "content" .}}
-
-                </div>
-            </div>
-
-        </div>
+<body class="bg-gray-100">
+<div class="flex">
+    <!-- Меню -->
+    <div class="w-64 bg-gray-800 text-white h-screen p-4">
+        <div class="text-lg font-bold">Админка</div>
+        <ul class="mt-4">
+            <li class="mb-2"><a href="/dashboard" class="block p-2 hover:bg-gray-700">Дашборд</a></li>
+            <li class="mb-2"><a href="/users" class="block p-2 hover:bg-gray-700">Пользователи</a></li>
+            <li class="mb-2"><a href="/devices" class="block p-2 hover:bg-gray-700">Устройства</a></li>
+        </ul>
     </div>
 
-
-    <div class="toast-wrapper" data-controller="toast">
-        <template id="toast">
-            <div class="toast rounded shadow-sm bg-white mb-3"
-                 role="alert"
-                 aria-live="assertive"
-                 aria-atomic="true"
-                 data-bs-delay="5000"
-                 data-bs-autohide="true">
-                <div class="toast-body p-3 d-flex">
-                    <p class="mb-0">
-                    <span class="text-{type}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"
-                             class="me-2" viewBox="0 0 16 16" role="img" path="bs.circle-fill"
-                             componentName="orchid-icon">
-  <circle cx="8" cy="8" r="8"></circle>
-</svg>
-
-                    </span>
-                        {message}
-                    </p>
-                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </template>
-
-
+    <!-- Контент -->
+    <div class="flex-1 p-4">
+        {{ template "content" . }}
     </div>
-
-
 </div>
-
-
 </body>
 </html>

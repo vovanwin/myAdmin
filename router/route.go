@@ -1,20 +1,14 @@
 package router
 
 import (
-	"github.com/gorilla/mux"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	css "myAdmin/resources"
 )
 
-type AdminRouter struct {
-	*mux.Router
-}
-
-func NewRouter() AdminRouter {
-	// Создаём подмаршруты для /admin
-	r := mux.NewRouter().PathPrefix("/admin").Subrouter()
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/admin/static/", http.FileServer(http.Dir("resources"))))
-
-	return AdminRouter{
-		r,
-	}
+func NewRouter(app *gin.Engine) error {
+	app.GET("/public/css/styles.css", func(c *gin.Context) {
+		// Отправляем содержимое CSS, встроенное в бинарник
+		c.Data(200, "text/css", []byte(css.CssContent))
+	})
+	return nil
 }

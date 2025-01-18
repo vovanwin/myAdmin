@@ -1,33 +1,41 @@
 package templates
 
 import (
-	"html/template"
-	"log"
+	"github.com/gin-contrib/multitemplate"
+	"path/filepath"
 )
 
-type AdminTemplate struct {
-	*template.Template
+type TemplateHtml struct {
+	multitemplate.Renderer
 }
 
-func ProvideTemplate() AdminTemplate {
-	tmpl, err := template.ParseFiles(
-		"resources/templates/layout/base.gohtml",
+// NewTemplateRenderer - инициализация шаблонов
+func TemplateRenderer() *TemplateHtml {
+	temp := loadTemplates("resources/templates")
+	return &TemplateHtml{
+		temp,
+	}
+}
 
-		"resources/templates/components/pagination.gohtml",
-		"resources/templates/components/table.gohtml",
-		"resources/templates/components/header.gohtml",
-		"resources/templates/components/breadcrumb.gohtml",
+func loadTemplates(templatesDir string) multitemplate.Renderer {
+	r := multitemplate.NewRenderer()
 
-		"resources/templates/layout/navbar.gohtml",
-		"resources/templates/layout/footer.gohtml",
-
-		"resources/templates/page/users/userList.gohtml",
-	)
+	adminLayouts, err := filepath.Glob(templatesDir + "/layout/base.gohtml")
 	if err != nil {
-		log.Fatal(err)
+		panic(err.Error())
 	}
 
-	return AdminTemplate{
-		tmpl,
+	admins, err := filepath.Glob(templatesDir + "/page/*/*.gohtml")
+	if err != nil {
+		panic(err.Error())
 	}
+
+	// Generate our templates map from our adminLayouts/ and admins/ directories
+	for _, admin := range admins {
+		layoutCopy := make([]string, len(adminLayouts))
+		copy(layoutCopy, adminLayouts)
+		layoutCopy = append(layoutCopy, admin)
+		r.AddFromFiles(filepath.Base(admin), layoutCopy...)
+	}
+	return r
 }
