@@ -1,0 +1,12 @@
+module.exports = {
+    content: [
+        "./resources/templates/**/*.gohtml",
+        "./resources/js/**/*.js",
+    ],
+    theme: {
+        extend: {},
+    },
+    plugins: [],
+    // Используйте purge, чтобы убрать неиспользуемые классы
+    purge: ['./resources/templates/**/*.{gohtml,js}', './resources/js/**/*.{js}'],
+}
