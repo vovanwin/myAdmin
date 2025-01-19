@@ -1,4 +1,9 @@
-для кодогенерации шаблонов установи templ
+Пробую сделать админку на go + templ + HTMX. 
+
+
+
+
+Для кодогенерации шаблонов установи templ
 
 ```
 go install github.com/a-h/templ/cmd/templ@latest
