@@ -1,6 +1,6 @@
 module.exports = {
     content: [
-        "./resources/templates/**/*.gohtml",
+        "./resources/templates/**/*.temple",
         "./resources/js/**/*.js",
     ],
     theme: {

@@ -1,147 +1,136 @@
 package devices
 
 import (
+	"bytes"
+	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
+	"math/rand"
+	"myAdmin/internal/dto"
+	templates "myAdmin/resources/templates/layout"
+	dashboardHTML "myAdmin/resources/templates/page/dashboard"
+	devicesHTML "myAdmin/resources/templates/page/devices"
+	profileHTML "myAdmin/resources/templates/page/profile"
+	usersHTML "myAdmin/resources/templates/page/users"
+	"time"
 )
 
-// Implementation содержит логику контроллера для работы с ролями.
+// Implementation содержит логику контроллера для работы с устройствами.
 type Implementation struct {
 	app *gin.Engine
 }
 
-// RegisterRoutes регистрирует маршруты для работы с ролями.
+// RegisterRoutes регистрирует маршруты для работы с устройствами.
 func RegisterRoutes(app *gin.Engine) {
 	controller := &Implementation{
 		app: app,
 	}
 
-	// Регистрация маршрута для отображения экрана ролей.
-	//app.GET("/devices", controller.DevicesScreen)
+	// Регистрация маршрутов
 	app.GET("/dashboard", controller.DashboardScreen)
-	app.GET("/profile", controller.ProfileScreen)
 	app.GET("/users", controller.UsersScreen)
-	app.GET("/users/:id/edit", controller.EditUserForm)
 	app.GET("/devices", controller.DevicesScreen)
-	app.GET("/devices/:id", controller.DeviceDetailScreen)
-	app.GET("/devices/:id/edit", controller.EditDeviceForm)
+	app.GET("/profile", controller.ProfileScreen)
+	app.GET("/devices-status", controller.DashboardDevicesScreen)
+	app.GET("/devices-status-sse", controller.sseDevices)
 }
 
+// DashboardScreen отображает дашборд.
 func (i *Implementation) DashboardScreen(c *gin.Context) {
-	c.HTML(200, "dashboard.gohtml", gin.H{
-		"Title":   "Дашборд",
-		"Content": "Добро пожаловать в админку!",
-	})
+	chart := createBarChart()
+	render(c, 200, "Дашборд", dashboardHTML.Dashboard(chart))
 }
-func (i *Implementation) ProfileScreen(c *gin.Context) {
-	// Пример данных пользователя (в реальном приложении данные будут браться из базы данных)
-	user := map[string]string{
-		"Name":  "Иван Иванов",
-		"Email": "ivan@example.com",
+
+// DashboardScreen отображает дашборд.
+func (i *Implementation) DashboardDevicesScreen(c *gin.Context) {
+	// Пример данных устройств
+	devices := []dto.DeviceDashboard{
+		{ID: "1", Name: "Устройство 1", Status: randomStatus()},
+		{ID: "2", Name: "Устройство 2", Status: randomStatus()},
+		{ID: "3", Name: "Устройство 3", Status: randomStatus()},
 	}
+	render(c, 200, "Дашборд", dashboardHTML.DevicesStatus(devices))
+}
+func (i *Implementation) sseDevices(c *gin.Context) {
+	c.Header("Content-Type", "text/event-stream")
+	c.Header("Cache-Control", "no-cache")
+	c.Header("Connection", "keep-alive")
 
-	c.HTML(200, "profile.gohtml", gin.H{
-		"Title": "Профиль пользователя",
-		"User":  user,
-	})
+	// Отправляем обновления каждые 5 секунд
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-c.Writer.CloseNotify():
+			// Клиент закрыл соединение
+			return
+		case <-ticker.C:
+			// Отправляем текущее состояние устройств
+			// Генерируем HTML с помощью шаблона
+
+			devices := []dto.DeviceDashboard{
+				{ID: "1", Name: "Устройство 1", Status: randomStatus()},
+				{ID: "2", Name: "Устройство 2", Status: randomStatus()},
+				{ID: "3", Name: "Устройство 3", Status: randomStatus()},
+			}
+			// Генерация HTML как строки
+			var buf bytes.Buffer
+			dashboardHTML.DevicesStatus(devices).Render(c, &buf)
+			html := buf.String()
+
+			c.SSEvent("message", html)
+			c.Writer.Flush()
+		}
+	}
 }
 
-func (i *Implementation) UpdateProfile(c *gin.Context) {
-	//// Логика обновления профиля
-	//name := c.PostForm("name")
-	//email := c.PostForm("email")
-
-	// Здесь можно добавить логику сохранения данных в базу данных
-
-	c.Redirect(302, "/profile")
-}
-
+// UsersScreen отображает список пользователей.
 func (i *Implementation) UsersScreen(c *gin.Context) {
-	// Пример данных пользователей (в реальном приложении данные будут браться из базы данных)
-	users := []map[string]string{
-		{"ID": "1", "Name": "Иван Иванов", "Email": "ivan@example.com"},
-		{"ID": "2", "Name": "Петр Петров", "Email": "petr@example.com"},
+	// Пример данных пользователей
+	users := []dto.User{
+		{ID: "1", Name: "Иван Иванов", Email: "ivan@example.com"},
+		{ID: "2", Name: "Петр Петров", Email: "petr@example.com"},
 	}
-
-	c.HTML(200, "list_users.gohtml", gin.H{
-		"Title": "Список пользователей",
-		"Users": users,
-	})
+	render(c, 200, "Список пользователей", usersHTML.ListUsers(users))
 }
 
-func (i *Implementation) EditUserForm(c *gin.Context) {
-	userID := c.Param("id")
-
-	// Пример данных пользователя (в реальном приложении данные будут браться из базы данных)
-	user := map[string]string{
-		"ID":    userID,
-		"Name":  "Иван Иванов",
-		"Email": "ivan@example.com",
-	}
-
-	c.HTML(200, "edit_user.gohtml", gin.H{
-		"Title": "Редактирование пользователя",
-		"User":  user,
-	})
-}
-
-func (i *Implementation) UpdateUser(c *gin.Context) {
-
-	// Логика обновления пользователя в базе данных
-
-	c.Redirect(302, "/users")
-}
-
+// DevicesScreen отображает список устройств.
 func (i *Implementation) DevicesScreen(c *gin.Context) {
-	// Пример данных устройств (в реальном приложении данные будут браться из базы данных)
-	devices := []map[string]string{
-		{"ID": "1", "Name": "Устройство 1", "Status": "Активно"},
-		{"ID": "2", "Name": "Устройство 2", "Status": "Неактивно"},
+	// Пример данных устройств
+	devices := []dto.Device{
+		{ID: "1", Name: "Устройство 1", Type: "Активно"},
+		{ID: "2", Name: "Устройство 2", Type: "Неактивно"},
 	}
-
-	c.HTML(200, "list_devices.gohtml", gin.H{
-		"Title":   "Список устройств",
-		"Devices": devices,
-	})
+	render(c, 200, "Список устройств", devicesHTML.ListDevices(devices))
 }
 
-func (i *Implementation) EditDeviceForm(c *gin.Context) {
-	deviceID := c.Param("id")
-
-	// Пример данных устройства (в реальном приложении данные будут браться из базы данных)
-	device := map[string]string{
-		"ID":     deviceID,
-		"Name":   "Устройство 1",
-		"Status": "Активно",
+// DevicesScreen отображает список устройств.
+func (i *Implementation) ProfileScreen(c *gin.Context) {
+	// Пример данных устройств
+	admin := dto.Profile{
+		ID:    "1",
+		Name:  "Владимир",
+		Email: "",
+		Role:  "Администратор",
 	}
-
-	c.HTML(200, "edit_device.gohtml", gin.H{
-		"Title":  "Редактирование устройства",
-		"Device": device,
-	})
+	render(c, 200, "Список устройств", profileHTML.Profile(admin))
 }
 
-func (i *Implementation) UpdateDevice(c *gin.Context) {
-	//deviceID := c.Param("id")
-	//name := c.PostForm("name")
-	//status := c.PostForm("status")
-
-	// Логика обновления устройства в базе данных
-
-	c.Redirect(302, "/devices")
+// render - универсальная функция рендеринга с поддержкой HTMX
+func render(c *gin.Context, code int, title string, content templ.Component) {
+	if c.GetHeader("HX-Request") != "" {
+		// Если запрос HTMX, рендерим только контент
+		content.Render(c.Request.Context(), c.Writer)
+	} else {
+		// Если обычный запрос, рендерим с базовым шаблоном
+		templates.Base(title, content).Render(c.Request.Context(), c.Writer)
+	}
 }
 
-func (i *Implementation) DeviceDetailScreen(c *gin.Context) {
-	deviceID := c.Param("id")
-
-	// Пример данных устройства (в реальном приложении данные будут браться из базы данных)
-	device := map[string]string{
-		"ID":     deviceID,
-		"Name":   "Устройство 1",
-		"Status": "Активно",
+// randomStatus генерирует случайный статус для устройства.
+func randomStatus() string {
+	if rand.Intn(2) == 0 {
+		return "open"
 	}
-
-	c.HTML(200, "device_detail.gohtml", gin.H{
-		"Title":  "Детали устройства",
-		"Device": device,
-	})
+	return "closed"
 }

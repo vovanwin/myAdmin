@@ -1,0 +1,30 @@
+// templates/base.templ
+package templates
+
+import (
+    componentHTML "myAdmin/resources/templates/page/components"
+)
+
+templ Base(title string, content templ.Component) {
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>{ title }</title>
+        <script src="https://unpkg.com/htmx.org"></script>
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    </head>
+    <body class="bg-gray-100">
+        <div class="flex">
+            <!-- Подключаем SideBar -->
+            @componentHTML.SideBar()
+
+            <!-- Контент -->
+            <div class="flex-1 p-4" id="content">
+                @content
+            </div>
+        </div>
+    </body>
+    </html>
+}

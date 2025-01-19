@@ -1,0 +1,23 @@
+// templates/devices_status.templ
+package dashboardHTML
+import "myAdmin/internal/dto"
+
+templ DevicesStatus(devices []dto.DeviceDashboard) {
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		for _, device := range devices {
+			<div class="bg-white p-6 rounded-lg shadow">
+				<div class="flex items-center justify-between">
+					<div class="text-lg font-bold">{ device.Name }</div>
+					if device.Status == "open" {
+						<div class="text-sm font-semibold text-green-600">{ device.Status } </div>
+					} else {
+						<div class="text-sm font-semibold text-red-600">{ device.Status } </div>
+					}
+				</div>
+				<div class="mt-4">
+					<div class="text-sm text-gray-500">ID: { device.ID }</div>
+				</div>
+			</div>
+		}
+	</div>
+}

@@ -1,0 +1,20 @@
+// templates/edit_device.templ
+package devicesHTML
+import "myAdmin/internal/dto"
+
+templ EditDevice(device dto.Device) {
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4">Редактирование устройства</h1>
+        <form action={  templ.SafeURL( "/devices/" + device.ID) } method="POST">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Название</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" name="name" type="text" placeholder="Название" value={ device.Name }/>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="status">Статус</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="status" name="status" type="text" placeholder="Статус" value={ device.Type }/>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Сохранить</button>
+        </form>
+    </div>
+}

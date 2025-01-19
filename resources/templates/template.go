@@ -2,6 +2,7 @@ package templates
 
 import (
 	"github.com/gin-contrib/multitemplate"
+	"html/template"
 	"path/filepath"
 )
 
@@ -19,7 +20,6 @@ func TemplateRenderer() *TemplateHtml {
 
 func loadTemplates(templatesDir string) multitemplate.Renderer {
 	r := multitemplate.NewRenderer()
-
 	adminLayouts, err := filepath.Glob(templatesDir + "/layout/base.gohtml")
 	if err != nil {
 		panic(err.Error())
@@ -30,12 +30,19 @@ func loadTemplates(templatesDir string) multitemplate.Renderer {
 		panic(err.Error())
 	}
 
-	// Generate our templates map from our adminLayouts/ and admins/ directories
 	for _, admin := range admins {
+		baseName := filepath.Base(admin)
 		layoutCopy := make([]string, len(adminLayouts))
 		copy(layoutCopy, adminLayouts)
 		layoutCopy = append(layoutCopy, admin)
-		r.AddFromFiles(filepath.Base(admin), layoutCopy...)
+
+		// Регистрация шаблона с layout
+		r.AddFromFiles(baseName, layoutCopy...)
+
+		// Регистрация шаблона без layout
+		tmpl := template.Must(template.New(baseName).ParseFiles(admin))
+		r.Add("nolayout_"+baseName, tmpl)
 	}
+
 	return r
 }

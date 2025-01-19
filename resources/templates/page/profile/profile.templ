@@ -1,0 +1,30 @@
+// templates/edit_user.templ
+package profileHTML
+
+import "myAdmin/internal/dto"
+
+
+
+templ Profile(user dto.Profile) {
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4">Профиль пользователя</h1>
+        <div class="flex items-center mb-4">
+            <img src="/static/avatar.png" alt="Аватар" class="w-12 h-12 rounded-full"/>
+            <div class="ml-4">
+                <div class="text-lg font-medium">{ user.Name }</div>
+                <div class="text-sm text-gray-500">{ user.Role }</div>
+            </div>
+        </div>
+        <form action="/profile" method="POST">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Имя</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" name="name" type="text" placeholder="Имя" value={ user.Name }/>
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name="email" type="email" placeholder="Email" value={ user.Email }/>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Сохранить</button>
+        </form>
+    </div>
+}
